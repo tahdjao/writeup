@@ -6,7 +6,7 @@ tags:
   - /connaissance/crypto
   - /connaissance/web
   - /challenge/hackropole
-descriptions: 
+descriptions:
 link:
 ---
 ### Ressources
@@ -17,15 +17,15 @@ Shuffle Shop est un chall proposé à FCSC 2020 en catégories Web/crypto.
 Ce Chall va nous permettre de voir les bases du chiffrement [AES ECB](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 # Recon
 Tout d'abord analisons le site qui nous est proposé.
-![[Pasted image 20240104115757.png]]
+![](/images/1.png)
 La première page du site semble juste être le sas d'entrée. Rien à signaler pour le code source non plus. Il nous est simplement dit que peu importe les actions que nous réaliserons plus tard, revenir à cette page les annulera.
 
 Entrons.
-![[Pasted image 20240104120626.png]]Cette page semble être un magasin de potions. Avec :
+![](/images/2.png)Cette page semble être un magasin de potions. Avec :
 
 >1- Un tableau de potions avec les différents prix de chacune.
   2- Notre portefeuille -> 5000 FCSC-coins
-  3- Notre panier actuel 
+  3- Notre panier actuel
 
 Il y a deux boutons :
 
@@ -33,10 +33,10 @@ Il y a deux boutons :
 >5- Un pour confirmer l'achat du panier
 
 Quand nous appuyons sur le Confirm cart avec le Panier vide nous avons une Alert erreur.
-![[Pasted image 20240104120843.png]]
+![](/images/4.png)
 
 - Le but du chall semble donc de reussir à acheter la Flag potion. Le problème est que cette potion coûte 10 000 FCSC-coins.
-![[Pasted image 20240104121023.png]]
+![](/images/3.png)
 ### Source code
 
 Il y a plusieurs fonctions js intéressantes dans le code source de cette page
@@ -92,7 +92,7 @@ function addItem(idx)
 
 - Fonction refreshCart
 qui va mettre à jour les potions du panier.
-la requête `cart.php?refresh` return le json en clair 
+la requête `cart.php?refresh` return le json en clair
 ```text
 {"total":0,"Health potion":0,"Stamina potion":0,"Strengh potion":0,"Clerverness potion":0,"Flag potion":0,"Breath potion":0,"Invisible potion":0,"Fly potion":0,"Love potion":0,"Fire-protection potion":0}
 ```
@@ -143,10 +143,10 @@ function validateCart()
 
 
 
-Le but maintenant semble clair modifier la valeur de `cart_enc` par du json_encoded avec le paramètre de Flag potion a 1.  
+Le but maintenant semble clair modifier la valeur de `cart_enc` par du json_encoded avec le paramètre de Flag potion a 1.
 
 
-### Ffuf 
+### Ffuf
 Faisons quand meme un petit Ffuf pour être sur de ne pas passer à coté d'une page.
 ```
 >>> ffuf -w `fzf-wordlists` -u "http://localhost:8000/FUZZ"
@@ -162,7 +162,7 @@ Revenons donc au Json_encoded.
 
 ### Encodage AES ECB
 
-- Encodage avec un panier vide est toujours le même. On peut donc supposer que la clef est une constante et ne change pas. 
+- Encodage avec un panier vide est toujours le même. On peut donc supposer que la clef est une constante et ne change pas.
 
 | AES always uses a block size of 128 bits (16 bytes) [source](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 
@@ -170,7 +170,7 @@ Sachant que c'est de l'hexa on peut découper le json_encoded par bloc de 32 car
 
 ```python
 >>>len('ed01c983b07a4706eb938131297f4a56d04f5ef584029a718b779a05967bae0b58a831353216845122eb26a951ac29eee049440c06e50aec529fb14bdbbe81d4cd1df04eb05e53626848b88121bb35747fca8a0ff4f5cf1c34812e251a99f5ad3c7e45712b14444d470cfe46c6f9b27a53d2da2e395063a67047ecc49dec5aba568c3df55964d7d3bab704e701831c3429e83a4493fd102cd9b49d2ada8b68d1a04cb37d89749b3254e1933360286b8fa0ca8a3aa1e227b75d2a0e3baa91aac35cc148da97c5cdd3cde4a35494765949')
-416 # en hexa donc 
+416 # en hexa donc
 
 >>> 416/32
 13.0
@@ -187,7 +187,7 @@ tamina potion":0
 ,"Strengh potion
 ":0,"Clerverness
  potion":0,"Flag <---  | # les Deux boc se ressemble on pourrait les switch
- potion":0,"Brea<---    
+ potion":0,"Brea<---
 th potion":0,"In
 visible potion":
 0,"Fly potion":0
@@ -196,7 +196,7 @@ visible potion":
 n potion":0}
 ```
 
-Ligne 9 et 10 les blocs se ressemble il suffirait donc de remplacer la ligne 10 (`potion":0,"Brea`) par la ligne 9 (`potion":1,"Flag`). Le nom importe peu vu que le programme utilise des ids. 
+Ligne 9 et 10 les blocs se ressemble il suffirait donc de remplacer la ligne 10 (`potion":0,"Brea`) par la ligne 9 (`potion":1,"Flag`). Le nom importe peu vu que le programme utilise des ids.
 Je vais donc acheter une potion Clerverness et coller le bloc a 1 dans Flag potion
 ```python
 #!/bin/python3
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
 ```
 
-ce code retourne 
+ce code retourne
 
 ```python
 
@@ -259,9 +259,9 @@ encoded json = d6753c1c1c0fea6dc5acb87141896dc2d04f5ef584029a718b779a05967bae0b5
 
 
 Nous avons plus qu'à écraser la valeur de cart_enc avec notre nouveau json_encoded
-![[Pasted image 20240104145648.png]]
+![](/images/5.png)
 
-![[Pasted image 20240104112310.png]]
+![](/images/6.png)
 # Flag
 
 ```
