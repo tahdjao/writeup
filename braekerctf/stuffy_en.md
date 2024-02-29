@@ -5,20 +5,26 @@ link: https://github.com/spipm/BraekerCTF_2024_public/tree/main
 
 # recon
 Let's start by reading the provided code. We can immediately see an SQL injection vulnerability.
+
 ![](../images/stuffy1.png)
+
 However, we don't have control over the username. It's chosen from the provided `usernames.txt` file, which is a list of random usernames + 4 random characters.
+
 ![](../images/stuffy2.png)
 
 So, SQLi isn't the right path.
 
 Among all the routes, we can notice the endpoint `/give_flag`.
+
 ![](../images/stuffy3.png)
+
 This function updates the value of "stuff" with the flag value for a user from the moment the request comes from the server itself.
 We can try adding the Headers manually, but it won't work because it's the nginx proxy that modifies the headers.
 So, we need to find a function that makes a request and redirect it to `/give_flag`.
 Fortunately, `/set_stuff` makes a request to `/update_profile_internal`.
 
 ![](../images/stuffy4.png)
+
 Set_stuff first retrieves our username from the cookies and checks that this user exists.
 Then it retrieves the stuff variable from the request and verifies that its length is less than 200.
 The `special_type` and `special_val` variables are similarly retrieved and cleaned with the `security_filter` function.
