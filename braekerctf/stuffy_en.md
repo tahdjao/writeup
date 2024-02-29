@@ -1,18 +1,18 @@
 Let's start by reading the provided code. We can immediately see an SQL injection vulnerability.
-![](stuffy1.png)
+![](../images/stuffy1.png)
 However, we don't have control over the username. It's chosen from the provided `usernames.txt` file, which is a list of random usernames + 4 random characters.
-![](stuffy2.png)
+![](../images/stuffy2.png)
 
 So, SQLi isn't the right path.
 
 Among all the routes, we can notice the endpoint `/give_flag`.
-![](stuffy3.png)
+![](../images/stuffy3.png)
 This function updates the value of "stuff" with the flag value for a user from the moment the request comes from the server itself.
 We can try adding the Headers manually, but it won't work because it's the nginx proxy that modifies the headers.
 So, we need to find a function that makes a request and redirect it to `/give_flag`.
 Fortunately, `/set_stuff` makes a request to `/update_profile_internal`.
 
-![](stuffy4.png)
+![](../images/stuffy4.png)
 Set_stuff first retrieves our username from the cookies and checks that this user exists.
 Then it retrieves the stuff variable from the request and verifies that its length is less than 200.
 The `special_type` and `special_val` variables are similarly retrieved and cleaned with the `security_filter` function.
@@ -47,9 +47,9 @@ special_type=Content-Length&special_val=80&stuff=aaaaaab%0d%0a%0d%0aPOST /give_f
 Here, `special_type` and `special_val` form a header that will inform the first request (the end of aaaaaab) = Content-length: 80.
 How do we find this number?
 
- ![](stuffy5.png)
+ ![](../images/stuffy5.png)
 We just need to find the size of this string.
-![](stuffy6.png)
+![](../images/stuffy6.png)
 Then we create a second request. After refreshing the page, we'll have the flag in our stuff.
-![](stuffy7.png)
+![](../images/stuffy7.png)
 That's it!
