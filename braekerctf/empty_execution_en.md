@@ -1,3 +1,7 @@
+# description
+This challenge is a web challenge written by spipm and part of the Braekerctf ctf. This challenge is a basic command injection with `..` and `/` bypass. Good reading
+
+# recon
 ```python
 from flask import Flask, jsonify, request
 import os
@@ -36,7 +40,7 @@ def run_command():
 
 
 if __name__ == '__main__':
-    
+
     # Make sure we can only execute binaries in the executables directory
     os.chdir('./executables/')
 

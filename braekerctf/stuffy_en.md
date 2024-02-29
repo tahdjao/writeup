@@ -1,3 +1,9 @@
+# description
+This challenge is a web challenge written by spipm and part of the Braekerctf ctf. This challenge is a request smuggling. Good reading.
+
+link: https://github.com/spipm/BraekerCTF_2024_public/tree/main
+
+# recon
 Let's start by reading the provided code. We can immediately see an SQL injection vulnerability.
 ![](../images/stuffy1.png)
 However, we don't have control over the username. It's chosen from the provided `usernames.txt` file, which is a list of random usernames + 4 random characters.
@@ -20,6 +26,8 @@ The `special_type` and `special_val` variables are similarly retrieved and clean
 
 So, we have control over three variables: stuff, special_val, and special_type.
 The most likely path is a request smuggling. Let's try.
+
+# POC
 ```
 POST /set_stuff HTTP/1.1
 Host: localhost:3000
@@ -52,4 +60,15 @@ We just need to find the size of this string.
 ![](../images/stuffy6.png)
 Then we create a second request. After refreshing the page, we'll have the flag in our stuff.
 ![](../images/stuffy7.png)
-That's it!
+
+
+# remediation
+- Ensure that the servers don't accept or process with multiple Content-length or Tranfer-Encoding.
+- Use HTTP/2 because it is designed to prevent smuggling attack by clearing delineating the boundaries of HTTP messages.
+
+
+# That's it!
+
+
+
+
