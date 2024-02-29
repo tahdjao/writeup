@@ -56,9 +56,13 @@ Here, `special_type` and `special_val` form a header that will inform the first 
 How do we find this number?
 
  ![](../images/stuffy5.png)
+ 
 We just need to find the size of this string.
+
 ![](../images/stuffy6.png)
+
 Then we create a second request. After refreshing the page, we'll have the flag in our stuff.
+
 ![](../images/stuffy7.png)
 
 
